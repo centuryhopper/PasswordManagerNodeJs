@@ -132,3 +132,6 @@ dist
 .pnp.*
 
 js_files/
+
+secretList.ts
+secrets.ts
