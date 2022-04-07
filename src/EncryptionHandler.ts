@@ -6,14 +6,11 @@ const cryptoVar = require("crypto");
 // SECRET_STRING must be EXACTLY characters 32 characters long
 import { SECRET_STRING } from "./secrets"
 
+import { encryptionObj } from "./interfaces";
 
-interface encryptionObj
-{
-  iv: string, password: string
-}
 
 const encrypt = (password : string) : encryptionObj => {
-  // Identifier to your encryption
+  // Identifier to your encryption (initialization vector)
   const iv : Buffer = Buffer.from(cryptoVar.randomBytes(16));
   const cipher = cryptoVar.createCipheriv("aes-256-ctr", Buffer.from(SECRET_STRING), iv);
 
