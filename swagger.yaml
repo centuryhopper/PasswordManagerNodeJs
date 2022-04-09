@@ -1,0 +1,161 @@
+
+openapi: 3.0.0
+info:
+  title: PasswordManager
+  description: Store your passwords in this database for safe keeping
+  version: "1.0"
+  license:
+    name: Apache 2.0
+    url: "http://apache.org/"
+servers:
+  - url: "http://localhost:3001"
+    description: "my local server"
+
+paths:
+  /passwords:
+    get:
+      summary: Returns an array of objects
+      description: Returns all user accounts with hashed passwords
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: [{title: dummy_title, username: dummy_username, password: dummy_password, iv: dummy_id, id: dummy_id}, {title: dummy_title2, username: dummy_username2, password: dummy_password2, iv: dummy_id2, id: dummy_id2}, etc...]
+        400:
+          description: User error
+        500:
+          description: Internal server error
+  /passwords/{title}:
+    get:
+      summary: Returns a user account object back with the unhashed password
+      description: Returns all user accounts with hashed passwords
+      parameters:
+          - in: path
+            name: title
+            schema:
+              type: string
+            required: true
+            description: to query out the user account with the provided title
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example: [{title: dummy_title, username: dummy_username, password: dummy_password, iv: dummy_id, id: dummy_id}, {title: dummy_title2, username: dummy_username2, password: dummy_password2, iv: dummy_id2, id: dummy_id2}, etc...]
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+  /passwords/accounts/many:
+    get:
+      summary: get an array of passwords
+      parameters:
+        - in: query
+          name: titles
+          schema:
+            type: array
+            items:
+              type: string
+          required: true
+          description: a stringified array of titles that exist in the database
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+  /create:
+    post:
+      summary: add a user account to the database
+      requestBody:
+        description: a user account object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+  /passwords/{title}/{newPassword}:
+    put:
+      summary: updates a user account
+      description: updates a user account object with a matching title with the provided new password
+      parameters:
+        - in: path
+          name: title
+          schema:
+            type: string
+          required: true
+          description: an existing title in the database
+        - in: path
+          name: newPassword
+          schema:
+            type: string
+          required: true
+          description: an updated password to be hashed to the existing title's password field
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+  /passwords/{toDelete}:
+    delete:
+      summary: Remove the user with the provided title, if it exists in the database
+      description: Returns all user accounts with hashed passwords
+      parameters:
+          - in: path
+            name: toDelete
+            schema:
+              type: string
+            required: true
+            description: to query out the user account with the provided title
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        title:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+    PasswordPair:
+      type: object
+      properties:
+        title:
+          type: string
+        password:
+          type: string

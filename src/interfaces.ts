@@ -6,6 +6,12 @@ export interface TitleAndPassword
     newPassword : string
 }
 
+export interface TitleQuery
+{
+  title: string,
+  id: string
+}
+
 export interface encryptionObj
 {
   iv: string, password: string
