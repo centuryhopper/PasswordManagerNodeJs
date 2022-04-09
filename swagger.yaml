@@ -30,6 +30,7 @@ paths:
           description: User error
         500:
           description: Internal server error
+
   /passwords/{title}:
     get:
       summary: Returns a user account object back with the unhashed password
@@ -94,6 +95,26 @@ paths:
         500:
           description: Internal server error
 
+  /create/accounts/many:
+    post:
+      summary: adds many user accounts to the database
+      requestBody:
+        description: a user account object
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
   /passwords/{title}/{newPassword}:
     put:
       summary: updates a user account
@@ -111,6 +132,27 @@ paths:
             type: string
           required: true
           description: an updated password to be hashed to the existing title's password field
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
+
+  /passwords/accounts/many/updates:
+    put:
+      summary: updates many user accounts
+      description: updates the passwords of many user account objects
+      requestBody:
+        description: a user account object
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PasswordPair'
       responses:
         200:
           description: Success
@@ -138,7 +180,25 @@ paths:
         500:
           description: Internal server error
 
-
+  /delete/accounts/many:
+    delete:
+      summary: delete all accounts with matching titles
+      parameters:
+        - in: query
+          name: titles
+          schema:
+            type: array
+            items:
+              type: string
+          required: true
+          description: a stringified array of titles that exist in the database
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Internal server error
 
 
 components:
@@ -157,5 +217,5 @@ components:
       properties:
         title:
           type: string
-        password:
+        newPassword:
           type: string

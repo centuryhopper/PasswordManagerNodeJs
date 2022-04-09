@@ -52,8 +52,8 @@ app.delete(`${BASE_PATH}/:title`, async (req, res) => {
     await deletePassword(TABLE_NAME, req.params.title, req, res)
 })
 
-app.delete(`${BASE_PATH}/accounts/many`, async (req, res) => {
-    await deletePasswords(TABLE_NAME, req.body, req, res)
+app.delete('/delete/accounts/many', async (req, res) => {
+    await deletePasswords(TABLE_NAME, req.query.titles, req, res)
 })
 
 app.post("/create", async (req , res) => {
@@ -62,10 +62,11 @@ app.post("/create", async (req , res) => {
     await addPassword(TABLE_NAME, {title, username, password, id:uuidv4()}, req,res)
 })
 
-app.post(`${BASE_PATH}/accounts/many`, async (req , res) => {
+app.post('/create/accounts/many', async (req , res) => {
     // get data from frontend
     let data = req.body
     data = data.map((obj:any) => ({...obj, id:uuidv4()}))
+    console.log(data)
 
     await addPasswords(TABLE_NAME, data, req, res)
 })

@@ -130,7 +130,7 @@ async function addPassword(tableName: string, values: PasswordNecessities, req :
         values.password = encrypted['password']
 
         const query = {
-            text: `INSERT INTO ${tableName} (title, username, password, id, iv) VALUES ($1,$2,$3,$4,$5)`,
+            text: `INSERT INTO ${tableName} (title, username, password, id, iv) VALUES ($1,$2,$3,$4,$5) returning *`,
             values: [...[values.title, values.username, values.password, values.id,], encrypted['iv']]
         }
 
@@ -142,7 +142,7 @@ async function addPassword(tableName: string, values: PasswordNecessities, req :
             }
             else
             {
-                res.send('insertion success!')
+                res.send(`insertion success! ${result.rows}`)
             }
         })
 
@@ -210,7 +210,8 @@ async function deletePassword(tableName: string, title: string, req: any, res: a
 
 async function deletePasswords(tableName: string, titles: string[], req: any, res: any) : Promise<void>
 {
-    for (const title of titles)
+    const arrayOfTitles = typeof(titles) === 'string' ? [titles] : titles
+    for (const title of arrayOfTitles)
     {
         const query = {
             text: `DELETE FROM ${tableName} where title = $1`,
@@ -222,13 +223,10 @@ async function deletePasswords(tableName: string, titles: string[], req: any, re
                 console.log(err)
                 client.end()
             }
-            else
-            {
-            }
         })
     }
 
-    res.send(`deleted rows with titles: ${titles}`)
+    res.send(`deleted rows with titles: ${arrayOfTitles}`)
 }
 
 async function updatePassword(tableName: string, title: string, newPassword: string, req: any, res: any) : Promise<void>
@@ -255,13 +253,13 @@ async function updatePassword(tableName: string, title: string, newPassword: str
 
 async function updatePasswords(tableName: string, accounts : TitleAndPassword[], req: any, res: any) : Promise<void>
 {
-    console.log(accounts);
+    console.log(`req.body: ${JSON.stringify(accounts)}`);
     for (const account of accounts)
     {
         const encrypted = encrypt(account.newPassword)
 
         const query = {
-            text: `UPDATE ${tableName} SET password = $1, iv = $2 WHERE title = $3`,
+            text: `UPDATE ${tableName} SET password = $1, iv = $2 WHERE title = $3 RETURNING title, password`,
             values: [encrypted['password'], encrypted['iv'], account.title]
         }
         await client.query(query, (err : Error, result: any) => {
@@ -272,6 +270,7 @@ async function updatePasswords(tableName: string, accounts : TitleAndPassword[],
             }
             else
             {
+                console.log(`queried: ${JSON.stringify(result.rows)}`)
             }
         })
     }
