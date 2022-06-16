@@ -34,7 +34,7 @@ paths:
   /passwords/{title}:
     get:
       summary: Returns a user account object back with the unhashed password
-      description: Returns all user accounts with hashed passwords
+      description: Returns a user account back with its unhashed password
       parameters:
           - in: path
             name: title
