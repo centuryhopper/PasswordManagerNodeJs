@@ -133,5 +133,5 @@ dist
 
 js_files/
 
-secretList.txt
+secretList.json
 secrets.ts

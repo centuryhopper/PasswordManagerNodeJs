@@ -3,6 +3,9 @@
 
 // do not add trailing commas for json objects
 
+// to interface with the api, enter this url into a browser
+// http://localhost:3001/api-docs
+
 // *** database, schema, and table creation should be done from postgresql ***
 import mongoose, { ConnectOptions } from "mongoose"
 import express from "express"
