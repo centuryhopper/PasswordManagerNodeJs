@@ -23,3 +23,12 @@ export interface PasswordNecessities
   password : string,
 }
 
+export type Pair<T,K> = [T,K]
+
+export interface GitHubSecretsFormat
+{
+  title: string,
+  // array of (iv, passwords i.e. myVar=myPassword)
+  secrets: any[],
+}
+

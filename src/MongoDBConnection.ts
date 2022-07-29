@@ -5,7 +5,7 @@ const accountModel = require('./models/AccountModel')
 
 
 // read entire the entire table named "tableName"
-const readTable = async (tableName: string, req: any, res: any) : Promise<void> =>
+const readTable = async (req: any, res: any) : Promise<void> =>
 {
     try {
         const table = await accountModel.find({})
@@ -16,7 +16,7 @@ const readTable = async (tableName: string, req: any, res: any) : Promise<void> 
     }
 }
 
-const getPassword = async(tableName: string, title: string, req:any, res:any) : Promise<void> =>
+const getPassword = async(title: string, req:any, res:any) : Promise<void> =>
 {
     try {
         const account = await accountModel.findOne({title: title})
@@ -29,7 +29,7 @@ const getPassword = async(tableName: string, title: string, req:any, res:any) : 
 }
 
 // return a list of accounts that can be found from the query array of titles
-const getPasswords = async (tableName:string, req:any, res:any) : Promise<void> =>
+const getPasswords = async (req:any, res:any) : Promise<void> =>
 {
     try {
         // one element passed into swagger seems to be of type string instead of array
@@ -43,7 +43,7 @@ const getPasswords = async (tableName:string, req:any, res:any) : Promise<void> 
     }
 }
 
-const addPassword = async (tableName: string, values: PasswordNecessities, req : any, res : any) : Promise<void> =>
+const addPassword = async (values: PasswordNecessities, req : any, res : any) : Promise<void> =>
 {
     try {
         const encrypted : encryptionObj = encrypt(values.password)
@@ -64,7 +64,7 @@ const addPassword = async (tableName: string, values: PasswordNecessities, req :
     }
 }
 
-const addPasswords = async (tableName: string, values: PasswordNecessities[], req : any, res : any) : Promise<void> =>
+const addPasswords = async (values: PasswordNecessities[], req : any, res : any) : Promise<void> =>
 {
     try {
 
@@ -96,7 +96,7 @@ const addPasswords = async (tableName: string, values: PasswordNecessities[], re
 
 }
 
-const deletePassword = async (tableName: string, title: string, req: any, res: any) : Promise<void> =>
+const deletePassword = async (title: string, req: any, res: any) : Promise<void> =>
 {
     try {
         await accountModel.deleteOne({title:title})
@@ -106,7 +106,7 @@ const deletePassword = async (tableName: string, title: string, req: any, res: a
     }
 }
 
-const deletePasswords = async (tableName: string, titles: string[], req: any, res: any) : Promise<void> =>
+const deletePasswords = async (titles: string[], req: any, res: any) : Promise<void> =>
 {
     try {
         // one element passed into swagger seems to be of type string instead of array
@@ -120,7 +120,7 @@ const deletePasswords = async (tableName: string, titles: string[], req: any, re
     }
 }
 
-const updatePassword = async (tableName: string, title: string, newPassword: string, req: any, res: any) : Promise<void> =>
+const updatePassword = async (title: string, newPassword: string, req: any, res: any) : Promise<void> =>
 {
     try {
         const encrypted : encryptionObj = encrypt(newPassword)
@@ -135,7 +135,7 @@ const updatePassword = async (tableName: string, title: string, newPassword: str
     }
 }
 
-const updatePasswords = async (tableName: string, accounts : TitleAndPassword[], req: any, res: any) : Promise<void> =>
+const updatePasswords = async (accounts : TitleAndPassword[], req: any, res: any) : Promise<void> =>
 {
     try {
         let results :string[] = []
