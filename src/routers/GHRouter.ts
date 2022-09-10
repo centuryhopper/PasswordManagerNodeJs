@@ -2,8 +2,7 @@ const { v4 } = require('uuid')
 const {encrypt, decrypt} = require("../EncryptionHandler")
 import 'dotenv/config'
 import express from 'express'
-import { GitHubSecretsFormat, encryptionObj, Pair} from '../interfaces'
-
+import { GitHubSecretsFormat, encryptionObj, Pair, TitleAndPassword} from '../interfaces'
 
 const GHModel = require('../models/GitHubRepoModel')
 const router = express.Router()
@@ -53,7 +52,7 @@ router.route('/get').get(async (req:any, res:any) : Promise<void> =>
 
         const accounts = await GHModel.find({title: {$in: arrayOfTitles}})
 
-        console.log(accounts)
+        // console.log(accounts)
 
         /*
         [
@@ -153,6 +152,82 @@ router.route('/post').post(async (req : any, res : any) : Promise<void> =>
     }
 })
 
+const updatePassword = async (title: string, secrets: {[key:string]: string}, statusArray: string[]) : Promise<void> =>
+{
+    var newSecrets : { iv: string, password: string }[] = []
+    for (const password of Object.values(secrets))
+    {
+        const encrypted : encryptionObj = encrypt(password)
+        newSecrets.push({iv: encrypted['iv'], password: encrypted['password']})
+    }
+    await GHModel.updateOne({title:title}, {$set: {secrets: newSecrets}})
+    statusArray.push(`updated password of account with ${title}`)
+}
+
+router.route('/updateOne').put(async (req : any, res : any) : Promise<void> =>
+{
+    /*
+    req.body input example
+    {
+        "title" : "FlightScraper",
+        "secrets": {
+            '0': "travelMap={\"source\":\"ORL\",\"destination\":\"LAX\"}"
+        }
+    }
+    */
+
+   // in the future we should probably let the user enter the old password for verification purposes
+   // before updating this account to the new password
+
+   try {
+        const { title, secrets } = req.body
+        let statusArray : string[] = []
+        await updatePassword(title, secrets, statusArray)
+        res.send(statusArray)
+    } catch (error:any) {
+        res.send(error.message)
+    }
+})
+
+router.route('/updateMany').put(async (req : any, res : any) : Promise<void> =>
+{
+    /*
+        req.body input example
+        [
+            {
+                "title" : "a",
+                "secrets": {
+                    0: "abc"
+                }
+            },
+            {
+                "title" : "b",
+                "secrets": {
+                    0: "def",
+                    1: "ghi"
+                }
+            },
+        ]
+    */
+    try {
+        const arrayofUpdatedAccounts : { title: string, secrets: { [key:string]:string } }[]= req.body
+        let statusArray : string[] = []
+        for (const {title, secrets} of arrayofUpdatedAccounts)
+        {
+            await updatePassword(title, secrets, statusArray)
+        }
+        res.send(statusArray)
+    } catch (error:any) {
+        res.send(error.message)
+    }
+})
+
+
+// var test : {[key:string]:string} = {
+//     '1': '2',
+//     2:'2'
+// }
+
 
 // const deletePassword = async (title: string, req: any, res: any) : Promise<void> =>
 // {
@@ -178,43 +253,5 @@ router.route('/post').post(async (req : any, res : any) : Promise<void> =>
 //     }
 // }
 
-// const updatePassword = async (title: string, newPassword: string, req: any, res: any) : Promise<void> =>
-// {
-//     try {
-//         const encrypted : encryptionObj = encrypt(newPassword)
-//         const encryptedPassword : string = encrypted['password']
-//         const encryptedId : string = encrypted['iv']
-
-//         await GHModel.updateOne({title:title}, {$set: {id: encryptedId, password: encryptedPassword}})
-//         res.send(`updated password of account with ${title}`)
-
-//     } catch (e:any) {
-//         res.send(e.message)
-//     }
-// }
-
-// const updatePasswords = async (accounts : TitleAndPassword[], req: any, res: any) : Promise<void> =>
-// {
-//     try {
-//         let results :string[] = []
-
-//         for (const {title, newPassword} of accounts)
-//         {
-//             const encrypted : encryptionObj = encrypt(newPassword)
-//             const encryptedPassword : string = encrypted['password']
-//             const encryptedId : string = encrypted['iv']
-//             await GHModel.updateOne({title:title}, {$set: {id: encryptedId, password: encryptedPassword}})
-//             results.push(title)
-//         }
-
-//         res.send(`accounts with successfully updated passwords ${results}`)
-
-//     } catch (e:any) {
-//         res.send(e.message)
-//     }
-// }
 
 module.exports = router
-
-
-
